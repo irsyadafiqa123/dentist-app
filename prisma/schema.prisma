@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+}
+
+enum AppointmentStatus {
+  BOOKED
+  FINISHED
+  CANCELLED
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  password String
+  name String
+  title String?
+  titleSuffix String?
+  role Role @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 1 to m relation to medicalrecords
+  medicalRecords MedicalRecord[]
+}
+
+model MedicalRecord {
+  id Int @id @default(autoincrement())
+  diagnosis String
+  treatmentResult String
+  treatmentDetail String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation to appointment
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  appointmentId Int @unique
+
+  // relation to user
+  user User @relation(fields: [userId], references: [id])
+  userId String // fk
+}
+
+model Patient {
+  id Int @id @default(autoincrement())
+  name String
+  phone String
+  address String?
+  birthDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation 1 to m appointments
+  appointments Appointment[]
+}
+
+model Appointment {
+  id Int @id @default(autoincrement())
+  datetime DateTime
+  complaint String
+  treatmentPlan String
+  status AppointmentStatus @default(BOOKED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation to patient
+  patient Patient @relation(fields: [patientId], references: [id])
+  patientId Int
+
+  // relation to medical record (optional)
+  medicalRecord MedicalRecord?
+}
