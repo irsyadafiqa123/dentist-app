@@ -238,12 +238,11 @@ export async function getAppointmentsStats(date?: string, status?: string) {
   }
 }
 
-export async function getPatientsName(search?: string, page?: string) {
-  const currentPage = page ? +page : 1;
-
-  const skip = (currentPage - 1) * ITEMS_PER_PAGE;
-  const take = ITEMS_PER_PAGE;
-
+export async function getPatientsName(
+  search?: string,
+  skip?: number,
+  take?: number,
+) {
   try {
     const patientsName = await prisma.patient.findMany({
       where: {
@@ -271,6 +270,8 @@ export async function getPatientsName(search?: string, page?: string) {
         },
       },
     });
+
+    console.log(patientsName);
 
     return { patientsName, total };
   } catch (error) {

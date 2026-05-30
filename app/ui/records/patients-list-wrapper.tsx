@@ -11,7 +11,12 @@ export default async function PatientListWrapper({
   page?: string;
   patient?: string;
 }) {
-  const { patientsName, total } = await getPatientsName(search, page);
+  const currentPage = page ? +page : 1;
+
+  const skip = (currentPage - 1) * ITEMS_PER_PAGE;
+  const take = ITEMS_PER_PAGE;
+
+  const { patientsName, total } = await getPatientsName(search, skip, take);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
